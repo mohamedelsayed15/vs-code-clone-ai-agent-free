@@ -64,6 +64,24 @@ Pick the target that matches your machine (`x64` or `arm64`). The app is written
 | macOS | `npm run gulp vscode-darwin-arm64-min` | Zip `../VSCode-darwin-arm64/*.app` (the app is unsigned, so right-click → Open the first time) |
 | Windows | `npm run gulp vscode-win32-x64-min` | `npm run gulp vscode-win32-x64-inno-updater vscode-win32-x64-user-setup` (output in `.build\win32-x64\user-setup\`; use `system-setup` for an all-users installer) |
 
+The first packaging run takes a few minutes (about 2 minutes on a modern Linux machine after `npm run compile`). The packaged app is self-contained, so you can copy the folder anywhere or zip it to share.
+
+### Run the packaged app
+
+| OS | Output folder | Run it |
+|---|---|---|
+| Linux | `../VSCode-linux-x64/` (~1.1 GB) | `../VSCode-linux-x64/code-oss`, or `../VSCode-linux-x64/bin/code-oss <folder>` from a terminal |
+| macOS | `../VSCode-darwin-arm64/` | Open `Code - OSS.app` (right-click → Open the first time, because it is unsigned) |
+| Windows | `..\VSCode-win32-x64\` | Run `Code - OSS.exe`, or install with the setup `.exe` from the installer step |
+
+On Linux, the same sandbox note applies as for the dev build. Either start it with `code-oss --no-sandbox`, or fix the helper once:
+
+```bash
+sudo chown root:root ../VSCode-linux-x64/chrome-sandbox && sudo chmod 4755 ../VSCode-linux-x64/chrome-sandbox
+```
+
+To check which build you are running, use `bin/code-oss --version`. It prints the version and the git commit it was built from.
+
 ---
 
 # Visual Studio Code - Open Source ("Code - OSS")
