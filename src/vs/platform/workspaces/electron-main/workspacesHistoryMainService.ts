@@ -16,7 +16,7 @@ import { basename, dirname, extUriBiasedIgnorePathCase, isEqual, originalFSPath 
 import { URI } from '../../../base/common/uri.js';
 import { Promises } from '../../../base/node/pfs.js';
 import { localize } from '../../../nls.js';
-import { ChatAIDisabledSettingId } from '../../chat/common/chatSettings.js';
+import { AIFeaturesRemoved, ChatAIDisabledSettingId } from '../../chat/common/chatSettings.js';
 import { IConfigurationService } from '../../configuration/common/configuration.js';
 import { createDecorator } from '../../instantiation/common/instantiation.js';
 import { ILifecycleMainService, LifecycleMainPhase } from '../../lifecycle/electron-main/lifecycleMainService.js';
@@ -397,7 +397,7 @@ export class WorkspacesHistoryMainService extends Disposable implements IWorkspa
 		];
 
 		// Agents Window (hidden when AI features are disabled)
-		if (this.configurationService.getValue<boolean>(ChatAIDisabledSettingId) !== true) {
+		if (!AIFeaturesRemoved && this.configurationService.getValue<boolean>(ChatAIDisabledSettingId) !== true) {
 			tasks.push({
 				type: 'task',
 				title: localize('agentsWindow', "Agents Window"),

@@ -1,3 +1,71 @@
+# Code - OSS without AI features
+
+This fork of [Code - OSS](https://github.com/microsoft/vscode) removes the built-in AI features:
+
+- **Chat / agent panel**: permanently hidden. Copilot setup, sign-in and the "Use AI Features" command are gone, and the Agents window opens a normal window instead.
+- **Bundled GitHub Copilot extension** (`extensions/copilot`): deleted, along with its build, lint and test wiring.
+- **AI inline suggestions (ghost text) and next-edit suggestions**: off by default (`editor.inlineSuggest.enabled: false`).
+- **Secondary side bar**: hidden by default, since it used to host chat.
+
+Regular IntelliSense (the suggestion dropdown) is unchanged. The switch is `AIFeaturesRemoved` in `src/vs/platform/chat/common/chatSettings.ts`.
+
+## Building
+
+Native modules are compiled during install, so **build on the OS you are targeting** (no cross-compiling).
+
+### Prerequisites (all platforms)
+
+- [Node.js](https://nodejs.org) at the exact version in [`.nvmrc`](.nvmrc) (e.g. `nvm install && nvm use`)
+- Python 3 and git
+
+### Linux
+
+```bash
+# Debian / Ubuntu
+sudo apt-get install -y build-essential g++ libx11-dev libxkbfile-dev libsecret-1-dev libkrb5-dev python-is-python3
+# Fedora / RHEL
+sudo dnf install -y @development-tools gcc-c++ libX11-devel libxkbfile-devel libsecret-devel krb5-devel
+```
+
+### macOS
+
+```bash
+xcode-select --install
+```
+
+### Windows
+
+- [Visual Studio 2022 Build Tools](https://visualstudio.microsoft.com/downloads/) with the **Desktop development with C++** workload and **MSVC Spectre-mitigated libs** (plus the ARM64 build tools for arm64 builds)
+- Python 3 from python.org or the Microsoft Store
+- Run all commands below from a Developer PowerShell / Command Prompt
+
+### Install and run from source
+
+```bash
+npm install
+npm run compile        # one-off build (or `npm run watch` to rebuild on change)
+./scripts/code.sh      # Linux / macOS
+scripts\code.bat       # Windows
+```
+
+On Ubuntu 24.04+ and other distros that restrict unprivileged user namespaces, the dev build aborts with *"The SUID sandbox helper binary was found, but is not configured correctly"*. Either run `./scripts/code.sh --no-sandbox`, or fix the helper once:
+
+```bash
+sudo chown root:root .build/electron/chrome-sandbox && sudo chmod 4755 .build/electron/chrome-sandbox
+```
+
+### Package a standalone app
+
+Pick the target that matches your machine (`x64` or `arm64`). The app is written to a sibling folder, e.g. `../VSCode-linux-x64`.
+
+| OS | App | Installers |
+|---|---|---|
+| Linux | `npm run gulp vscode-linux-x64-min` | `.deb`: `npm run gulp vscode-linux-x64-prepare-deb vscode-linux-x64-build-deb` (output in `.build/linux/deb/`)<br>`.rpm`: `npm run gulp vscode-linux-x64-prepare-rpm vscode-linux-x64-build-rpm` (needs `rpmbuild`) |
+| macOS | `npm run gulp vscode-darwin-arm64-min` | Zip `../VSCode-darwin-arm64/*.app` (the app is unsigned, so right-click → Open the first time) |
+| Windows | `npm run gulp vscode-win32-x64-min` | `npm run gulp vscode-win32-x64-inno-updater vscode-win32-x64-user-setup` (output in `.build\win32-x64\user-setup\`; use `system-setup` for an all-users installer) |
+
+---
+
 # Visual Studio Code - Open Source ("Code - OSS")
 [![Feature Requests](https://img.shields.io/github/issues/microsoft/vscode/feature-request.svg)](https://github.com/microsoft/vscode/issues?q=is%3Aopen+is%3Aissue+label%3Afeature-request+sort%3Areactions-%2B1-desc)
 [![Bugs](https://img.shields.io/github/issues/microsoft/vscode/bug.svg)](https://github.com/microsoft/vscode/issues?utf8=✓&q=is%3Aissue+is%3Aopen+label%3Abug)

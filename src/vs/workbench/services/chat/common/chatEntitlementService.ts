@@ -27,6 +27,7 @@ import { URI } from '../../../../base/common/uri.js';
 import Severity from '../../../../base/common/severity.js';
 import { IWorkbenchEnvironmentService } from '../../environment/common/environmentService.js';
 import { isWeb } from '../../../../base/common/platform.js';
+import { AIFeaturesRemoved } from '../../../../platform/chat/common/chatSettings.js';
 import { ILifecycleService } from '../../lifecycle/common/lifecycle.js';
 import { Mutable } from '../../../../base/common/types.js';
 import { InstantiationType, registerSingleton } from '../../../../platform/instantiation/common/extensions.js';
@@ -450,8 +451,8 @@ export class ChatEntitlementService extends Disposable implements IChatEntitleme
 		);
 		this.sentimentObs = observableFromEvent(this.onDidChangeSentiment, () => this.sentiment);
 
-		if ((isWeb && !environmentService.remoteAuthority && !environmentService.isSessionsWindow)) {
-			ChatEntitlementContextKeys.Setup.hidden.bindTo(this.contextKeyService).set(true); // hide copilot UI on web if unsupported
+		if (AIFeaturesRemoved || (isWeb && !environmentService.remoteAuthority && !environmentService.isSessionsWindow)) {
+			ChatEntitlementContextKeys.Setup.hidden.bindTo(this.contextKeyService).set(true); // hide copilot UI when AI features are removed, or on web if unsupported
 			return;
 		}
 
@@ -731,6 +732,9 @@ export class ChatEntitlementService extends Disposable implements IChatEntitleme
 	}
 
 	setForceHidden(hidden: boolean): void {
+		if (AIFeaturesRemoved) {
+			return; // chat stays hidden when AI features are removed
+		}
 		if (this.context) {
 			this.context.value.setForceHidden(hidden);
 		} else {

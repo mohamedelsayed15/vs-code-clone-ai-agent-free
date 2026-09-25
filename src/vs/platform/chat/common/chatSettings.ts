@@ -6,6 +6,12 @@
 export const ChatAIDisabledSettingId = 'chat.disableAIFeatures';
 
 /**
+ * AI features (chat, agents, Copilot, AI inline suggestions) are removed from this build.
+ * Typed as `boolean` so that code guarded by it stays reachable for the compiler.
+ */
+export const AIFeaturesRemoved: boolean = true;
+
+/**
  * Configuration key gating the "Continue with Microsoft" sign-in choice. When `true`, every
  * sign-in dialog offers it, and choosing it exchanges a Microsoft Entra sign-in for a GitHub
  * token that is published as a process-lifetime GitHub authentication session. Off by default

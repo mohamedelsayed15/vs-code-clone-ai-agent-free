@@ -208,15 +208,13 @@ export function createBuildPlan(saved: StateReadResult, environment: string, cha
 
 	let client: LaneMode = outputs.client ? 'skip' : 'full';
 	let extensions: LaneMode = outputs.extensions ? 'skip' : 'full';
-	let copilot: LaneMode = outputs.copilot ? 'skip' : 'full';
+	const copilot: LaneMode = 'skip';
 
 	for (const filePath of changedPaths) {
 		if (filePath.startsWith('src/')) {
 			if (client === 'skip') {
 				client = 'incremental';
 			}
-		} else if (filePath.startsWith('extensions/copilot/')) {
-			copilot = 'full';
 		} else if (filePath.startsWith('extensions/') || filePath.startsWith('.vscode/extensions/')) {
 			extensions = 'full';
 		}
@@ -346,14 +344,14 @@ function isGlobalBuildInput(filePath: string): boolean {
 }
 
 function fullPlan(reason: string, changedPaths: readonly string[]): BuildFastPlan {
-	return { reason, changedPaths, client: 'full', extensions: 'full', copilot: 'full' };
+	return { reason, changedPaths, client: 'full', extensions: 'full', copilot: 'skip' }; // copilot extension removed from this build
 }
 
 async function getOutputStatus(repoRoot: string): Promise<OutputStatus> {
 	const [client, extensions, copilot] = await Promise.all([
 		pathExists(path.join(repoRoot, 'out', 'main.js')),
 		pathExists(path.join(repoRoot, 'extensions', 'configuration-editing', 'out', 'configurationEditingMain.js')),
-		pathExists(path.join(repoRoot, 'extensions', 'copilot', 'dist', 'extension.js')),
+		Promise.resolve(true), // copilot extension removed from this build
 	]);
 	return { client, extensions, copilot };
 }
@@ -381,7 +379,6 @@ async function runAllFull(repoRoot: string): Promise<void> {
 	await waitForTasks([
 		runCommand(repoRoot, process.execPath, [path.join(repoRoot, 'build', 'next', 'index.ts'), 'transpile'], 'client'),
 		runCommand(repoRoot, npmCommand(), EXTENSION_BUILD_ARGS, 'extensions'),
-		runCommand(repoRoot, npmCommand(), COPILOT_BUILD_ARGS, 'copilot'),
 	]);
 }
 
@@ -420,16 +417,12 @@ function logPlan(plan: BuildFastPlan): void {
 }
 
 function readEnvironment(repoRoot: string): string {
-	const copilotPackage = JSON.parse(fs.readFileSync(path.join(repoRoot, 'extensions', 'copilot', 'package.json'), 'utf8')) as {
-		readonly devDependencies?: Readonly<Record<string, string>>;
-	};
 	return [
 		`recipe=${BUILD_RECIPE}`,
 		`platform=${process.platform}`,
 		`arch=${process.arch}`,
 		`node=${process.version}`,
 		`esbuild=${esbuild.version}`,
-		`copilot-esbuild=${copilotPackage.devDependencies?.esbuild ?? ''}`,
 	].join(';');
 }
 

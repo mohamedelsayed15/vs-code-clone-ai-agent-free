@@ -4582,7 +4582,7 @@ export type InternalInlineSuggestOptions = Readonly<RequiredRecursive<IInlineSug
 class InlineEditorSuggest extends BaseEditorOption<EditorOption.inlineSuggest, IInlineSuggestOptions, InternalInlineSuggestOptions> {
 	constructor() {
 		const defaults: InternalInlineSuggestOptions = {
-			enabled: true,
+			enabled: false, // AI inline suggestions are removed from this build
 			mode: 'subwordSmart',
 			showToolbar: 'onHover',
 			suppressSuggestions: false,
@@ -4592,7 +4592,7 @@ class InlineEditorSuggest extends BaseEditorOption<EditorOption.inlineSuggest, I
 			minShowDelay: 0,
 			suppressInSnippetMode: true,
 			edits: {
-				enabled: true,
+				enabled: false,
 				showCollapsed: false,
 				renderSideBySide: 'auto',
 				allowCodeShifting: 'always',
