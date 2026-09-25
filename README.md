@@ -60,7 +60,7 @@ Pick the target that matches your machine (`x64` or `arm64`). The app is written
 
 | OS | App | Installers |
 |---|---|---|
-| Linux | `npm run gulp vscode-linux-x64-min` | `.deb`: `npm run gulp vscode-linux-x64-prepare-deb vscode-linux-x64-build-deb` (output in `.build/linux/deb/`)<br>`.rpm`: `npm run gulp vscode-linux-x64-prepare-rpm vscode-linux-x64-build-rpm` (needs `rpmbuild`) |
+| Linux | `npm run gulp vscode-linux-x64-min` | `.deb`: run `npm run gulp vscode-linux-x64-prepare-deb`, then `npm run gulp vscode-linux-x64-build-deb` (run them one after the other, not in one `gulp` call). Output: `.build/linux/deb/amd64/deb/code-oss_<version>_amd64.deb`<br>`.rpm`: `npm run gulp vscode-linux-x64-prepare-rpm`, then `npm run gulp vscode-linux-x64-build-rpm` (needs `rpmbuild`) |
 | macOS | `npm run gulp vscode-darwin-arm64-min` | Zip `../VSCode-darwin-arm64/*.app` (the app is unsigned, so right-click → Open the first time) |
 | Windows | `npm run gulp vscode-win32-x64-min` | `npm run gulp vscode-win32-x64-inno-updater vscode-win32-x64-user-setup` (output in `.build\win32-x64\user-setup\`; use `system-setup` for an all-users installer) |
 
@@ -81,6 +81,20 @@ sudo chown root:root ../VSCode-linux-x64/chrome-sandbox && sudo chmod 4755 ../VS
 ```
 
 To check which build you are running, use `bin/code-oss --version`. It prints the version and the git commit it was built from.
+
+### Install the .deb (Debian / Ubuntu)
+
+```bash
+sudo apt install ./.build/linux/deb/amd64/deb/code-oss_*_amd64.deb
+```
+
+This adds **Code - OSS** to your app menu with its icon, and puts the `code-oss` command on your `PATH`. To update, build a newer `.deb` and install it the same way; your settings and extensions are kept. To remove it, run `sudo apt remove code-oss`.
+
+The `.deb` needs glibc 2.29 or newer (Ubuntu 20.04+, Debian 11+), because native modules are compiled on the build machine. The first `prepare-deb` run downloads a ~150 MB Linux sysroot from GitHub to work out the package dependencies.
+
+### App icon
+
+The icon is an original design (a `>_` prompt on a teal-to-indigo rounded square). It lives in `resources/linux/code.png`, `resources/win32/code.ico` (+ `code_70x70.png`, `code_150x150.png`), `resources/darwin/code.icns` and `resources/server/`. To change it, replace those files and repackage. The official VS Code logo is a Microsoft trademark and must not be used in forks.
 
 ---
 

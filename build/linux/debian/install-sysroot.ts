@@ -85,6 +85,7 @@ async function fetchUrl(options: IFetchOptions): Promise<void> {
 	console.log(`Found asset ${options.assetName} @ ${asset.url}.`);
 	const assetContents = Buffer.from(await download(asset.url, {
 		...downloadOptions,
+		timeout: 10 * 60_000, // the sysroot is large; the default 30s is too short on slower connections
 		headers: ghDownloadHeaders,
 		checksumSha256: options.checksumSha256
 	}));
