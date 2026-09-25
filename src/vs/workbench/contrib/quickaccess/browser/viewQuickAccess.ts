@@ -7,6 +7,7 @@ import { localize, localize2 } from '../../../../nls.js';
 import { IQuickPickSeparator, IQuickInputService, ItemActivation } from '../../../../platform/quickinput/common/quickInput.js';
 import { IPickerQuickAccessItem, PickerQuickAccessProvider } from '../../../../platform/quickinput/browser/pickerQuickAccess.js';
 import { IViewDescriptorService, ViewContainer, ViewContainerLocation } from '../../../common/views.js';
+import { SecondarySideBarRemoved } from '../../../services/layout/browser/layoutService.js';
 import { IViewsService } from '../../../services/views/common/viewsService.js';
 import { IOutputService } from '../../../services/output/common/output.js';
 import { ITerminalGroupService, ITerminalService } from '../../terminal/browser/terminal.js';
@@ -151,7 +152,9 @@ export class ViewQuickAccessProvider extends PickerQuickAccessProvider<IViewQuic
 		// Viewlets / Panels
 		addPaneComposites(ViewContainerLocation.Sidebar, localize('views', "Side Bar"));
 		addPaneComposites(ViewContainerLocation.Panel, localize('panels', "Panel"));
-		addPaneComposites(ViewContainerLocation.AuxiliaryBar, localize('secondary side bar', "Secondary Side Bar"));
+		if (!SecondarySideBarRemoved) {
+			addPaneComposites(ViewContainerLocation.AuxiliaryBar, localize('secondary side bar', "Secondary Side Bar"));
+		}
 
 		const addPaneCompositeViews = (location: ViewContainerLocation) => {
 			const paneComposites = this.paneCompositeService.getPaneComposites(location);
@@ -166,7 +169,9 @@ export class ViewQuickAccessProvider extends PickerQuickAccessProvider<IViewQuic
 		// Side Bar / Panel Views
 		addPaneCompositeViews(ViewContainerLocation.Sidebar);
 		addPaneCompositeViews(ViewContainerLocation.Panel);
-		addPaneCompositeViews(ViewContainerLocation.AuxiliaryBar);
+		if (!SecondarySideBarRemoved) {
+			addPaneCompositeViews(ViewContainerLocation.AuxiliaryBar);
+		}
 
 		// Terminals
 		this.terminalGroupService.groups.forEach((group, groupIndex) => {

@@ -5,9 +5,9 @@ This fork of [Code - OSS](https://github.com/microsoft/vscode) removes the built
 - **Chat / agent panel**: permanently hidden. Copilot setup, sign-in and the "Use AI Features" command are gone, and the Agents window opens a normal window instead.
 - **Bundled GitHub Copilot extension** (`extensions/copilot`): deleted, along with its build, lint and test wiring.
 - **AI inline suggestions (ghost text) and next-edit suggestions**: off by default (`editor.inlineSuggest.enabled: false`).
-- **Secondary side bar**: hidden by default, since it used to host chat.
+- **Secondary side bar** (the right-hand panel that hosted chat): removed together with its title-bar toggle, `Ctrl+Alt+B` shortcut and menu entries. Extension views that target it open in the primary side bar instead.
 
-Regular IntelliSense (the suggestion dropdown) is unchanged. The switch is `AIFeaturesRemoved` in `src/vs/platform/chat/common/chatSettings.ts`.
+Regular IntelliSense (the suggestion dropdown) and the primary side bar (Explorer, Search, and so on) are unchanged. The switches are `AIFeaturesRemoved` in `src/vs/platform/chat/common/chatSettings.ts` and `SecondarySideBarRemoved` in `src/vs/workbench/services/layout/browser/layoutService.ts`.
 
 ## Building
 

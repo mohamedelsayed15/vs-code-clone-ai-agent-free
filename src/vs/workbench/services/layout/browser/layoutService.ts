@@ -16,6 +16,12 @@ import { isFullscreen, isWCOEnabled } from '../../../../base/browser/browser.js'
 import { IConfigurationService } from '../../../../platform/configuration/common/configuration.js';
 import { IDisposable } from '../../../../base/common/lifecycle.js';
 
+/**
+ * The secondary side bar is removed from this build: it always stays hidden and
+ * its toggles are gone. Typed as `boolean` so guarded code stays reachable.
+ */
+export const SecondarySideBarRemoved: boolean = true;
+
 export const IWorkbenchLayoutService = refineServiceDecorator<ILayoutService, IWorkbenchLayoutService>(ILayoutService);
 
 export const enum Parts {

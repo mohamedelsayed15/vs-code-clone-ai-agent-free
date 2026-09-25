@@ -22,6 +22,7 @@ import { CustomTreeView, TreeViewPane } from '../../browser/parts/views/treeView
 import { ViewPaneContainer } from '../../browser/parts/views/viewPaneContainer.js';
 import { IWorkbenchContribution, WorkbenchPhase, registerWorkbenchContribution2 } from '../../common/contributions.js';
 import { ICustomViewDescriptor, IViewContainersRegistry, IViewDescriptor, IViewsRegistry, ViewContainer, Extensions as ViewContainerExtensions, ViewContainerLocation } from '../../common/views.js';
+import { SecondarySideBarRemoved } from '../../services/layout/browser/layoutService.js';
 import { VIEWLET_ID as DEBUG } from '../../contrib/debug/common/debug.js';
 import { VIEWLET_ID as EXPLORER } from '../../contrib/files/common/files.js';
 import { VIEWLET_ID as REMOTE } from '../../contrib/remote/browser/remoteExplorer.js';
@@ -321,7 +322,12 @@ class ViewsExtensionHandler implements IWorkbenchContribution {
 						panelOrder = this.registerCustomViewContainers(value, description, panelOrder, existingViewContainers, ViewContainerLocation.Panel);
 						break;
 					case 'secondarySidebar':
-						auxiliaryBarOrder = this.registerCustomViewContainers(value, description, auxiliaryBarOrder, existingViewContainers, ViewContainerLocation.AuxiliaryBar);
+						// The secondary side bar is removed from this build: host these containers in the primary side bar
+						if (SecondarySideBarRemoved) {
+							activityBarOrder = this.registerCustomViewContainers(value, description, activityBarOrder, existingViewContainers, ViewContainerLocation.Sidebar);
+						} else {
+							auxiliaryBarOrder = this.registerCustomViewContainers(value, description, auxiliaryBarOrder, existingViewContainers, ViewContainerLocation.AuxiliaryBar);
+						}
 						break;
 				}
 			});

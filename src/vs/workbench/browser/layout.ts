@@ -12,7 +12,7 @@ import { isWindows, isLinux, isMacintosh, isWeb, isIOS } from '../../base/common
 import { EditorInputCapabilities, GroupIdentifier, isResourceEditorInput, IUntypedEditorInput, pathsToEditors } from '../common/editor.js';
 import { SidebarPart } from './parts/sidebar/sidebarPart.js';
 import { PanelPart } from './parts/panel/panelPart.js';
-import { Position, Parts, PartOpensMaximizedOptions, IWorkbenchLayoutService, positionFromString, positionToString, partOpensMaximizedFromString, PanelAlignment, ActivityBarPosition, LayoutSettings, MULTI_WINDOW_PARTS, SINGLE_WINDOW_PARTS, ZenModeSettings, EditorTabsMode, EditorActionsLocation, shouldShowCustomTitleBar, isHorizontal, isMultiWindowPart, IPartVisibilityChangeEvent, isFloatingTopEdgeExposed, ModernUIDensity } from '../services/layout/browser/layoutService.js';
+import { Position, Parts, PartOpensMaximizedOptions, IWorkbenchLayoutService, positionFromString, positionToString, partOpensMaximizedFromString, PanelAlignment, ActivityBarPosition, LayoutSettings, MULTI_WINDOW_PARTS, SINGLE_WINDOW_PARTS, ZenModeSettings, EditorTabsMode, EditorActionsLocation, shouldShowCustomTitleBar, isHorizontal, isMultiWindowPart, IPartVisibilityChangeEvent, isFloatingTopEdgeExposed, ModernUIDensity, SecondarySideBarRemoved } from '../services/layout/browser/layoutService.js';
 import { isTemporaryWorkspace, IWorkspaceContextService, WorkbenchState } from '../../platform/workspace/common/workspace.js';
 import { IStorageService, StorageScope, StorageTarget } from '../../platform/storage/common/storage.js';
 import { IConfigurationChangeEvent, IConfigurationService, isConfigured } from '../../platform/configuration/common/configuration.js';
@@ -835,6 +835,11 @@ export abstract class Layout extends Disposable implements IWorkbenchLayoutServi
 			} else {
 				this.stateModel.setRuntimeValue(LayoutStateKeys.PANEL_HIDDEN, true);
 			}
+		}
+
+		// Secondary side bar is removed from this build
+		if (SecondarySideBarRemoved) {
+			this.stateModel.setRuntimeValue(LayoutStateKeys.AUXILIARYBAR_HIDDEN, true);
 		}
 
 		// Auxiliary View to restore
@@ -2178,6 +2183,7 @@ export abstract class Layout extends Disposable implements IWorkbenchLayoutServi
 
 	setAuxiliaryBarMaximized(maximized: boolean): boolean {
 		if (
+			(maximized && SecondarySideBarRemoved) ||		// secondary side bar is removed from this build
 			this.inMaximizedAuxiliaryBarTransition ||		// prevent re-entrance
 			(maximized === this.isAuxiliaryBarMaximized())	// return early if state is already present
 		) {
@@ -2288,6 +2294,10 @@ export abstract class Layout extends Disposable implements IWorkbenchLayoutServi
 	}
 
 	private setAuxiliaryBarHidden(hidden: boolean, skipLayout?: boolean): void {
+		if (SecondarySideBarRemoved) {
+			hidden = true;
+		}
+
 		if (hidden && this.setAuxiliaryBarMaximized(false) && !this.isVisible(Parts.AUXILIARYBAR_PART)) {
 			return; // return: leaving maximised auxiliary bar made this part hidden
 		}

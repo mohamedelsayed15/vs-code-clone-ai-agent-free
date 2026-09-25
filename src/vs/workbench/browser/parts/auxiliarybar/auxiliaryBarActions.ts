@@ -11,7 +11,7 @@ import { registerIcon } from '../../../../platform/theme/common/iconRegistry.js'
 import { Categories } from '../../../../platform/action/common/actionCommonCategories.js';
 import { AuxiliaryBarMaximizedContext, AuxiliaryBarVisibleContext, IsAuxiliaryWindowContext, SecondarySideBarVisibleContext } from '../../../common/contextkeys.js';
 import { ViewContainerLocation, ViewContainerLocationToString } from '../../../common/views.js';
-import { ActivityBarPosition, IWorkbenchLayoutService, LayoutSettings, Parts } from '../../../services/layout/browser/layoutService.js';
+import { ActivityBarPosition, IWorkbenchLayoutService, LayoutSettings, Parts, SecondarySideBarRemoved } from '../../../services/layout/browser/layoutService.js';
 import { IPaneCompositePartService } from '../../../services/panecomposite/browser/panecomposite.js';
 import { ServicesAccessor } from '../../../../platform/instantiation/common/instantiation.js';
 import { KeybindingWeight } from '../../../../platform/keybinding/common/keybindingsRegistry.js';
@@ -46,12 +46,12 @@ export class ToggleAuxiliaryBarAction extends Action2 {
 			metadata: {
 				description: localize('openAndCloseAuxiliaryBar', 'Open/Show and Close/Hide Secondary Side Bar'),
 			},
-			f1: true,
-			keybinding: {
+			f1: !SecondarySideBarRemoved,
+			keybinding: SecondarySideBarRemoved ? undefined : {
 				weight: KeybindingWeight.WorkbenchContrib,
 				primary: KeyMod.CtrlCmd | KeyMod.Alt | KeyCode.KeyB
 			},
-			menu: [
+			menu: SecondarySideBarRemoved ? [] : [
 				{
 					id: MenuId.LayoutControlMenuSubmenu,
 					group: '0_workbench_layout',
@@ -91,7 +91,7 @@ registerAction2(class extends Action2 {
 			title: localize2('closeSecondarySideBar', 'Hide Secondary Side Bar'),
 			category: Categories.View,
 			precondition: AuxiliaryBarVisibleContext,
-			f1: true,
+			f1: !SecondarySideBarRemoved,
 		});
 	}
 	run(accessor: ServicesAccessor) {
@@ -109,7 +109,7 @@ registerAction2(class FocusAuxiliaryBarAction extends Action2 {
 			id: FocusAuxiliaryBarAction.ID,
 			title: FocusAuxiliaryBarAction.LABEL,
 			category: Categories.View,
-			f1: true,
+			f1: !SecondarySideBarRemoved,
 		});
 	}
 
@@ -128,7 +128,7 @@ registerAction2(class FocusAuxiliaryBarAction extends Action2 {
 	}
 });
 
-MenuRegistry.appendMenuItems([
+MenuRegistry.appendMenuItems(SecondarySideBarRemoved ? [] : [
 	{
 		id: MenuId.LayoutControlMenu,
 		item: {
@@ -187,7 +187,7 @@ registerAction2(class extends SwitchCompositeViewAction {
 			id: 'workbench.action.previousAuxiliaryBarView',
 			title: localize2('previousAuxiliaryBarView', 'Previous Secondary Side Bar View'),
 			category: Categories.View,
-			f1: true
+			f1: !SecondarySideBarRemoved
 		}, ViewContainerLocation.AuxiliaryBar, -1);
 	}
 });
@@ -198,7 +198,7 @@ registerAction2(class extends SwitchCompositeViewAction {
 			id: 'workbench.action.nextAuxiliaryBarView',
 			title: localize2('nextAuxiliaryBarView', 'Next Secondary Side Bar View'),
 			category: Categories.View,
-			f1: true
+			f1: !SecondarySideBarRemoved
 		}, ViewContainerLocation.AuxiliaryBar, 1);
 	}
 });
@@ -215,7 +215,7 @@ class MaximizeAuxiliaryBar extends Action2 {
 			title: localize2('maximizeAuxiliaryBar', 'Maximize Secondary Side Bar'),
 			tooltip: localize('maximizeAuxiliaryBarTooltip', "Maximize Secondary Side Bar"),
 			category: Categories.View,
-			f1: true,
+			f1: !SecondarySideBarRemoved,
 			precondition: AuxiliaryBarMaximizedContext.negate(),
 		});
 	}
@@ -238,7 +238,7 @@ class RestoreAuxiliaryBar extends Action2 {
 			title: localize2('restoreAuxiliaryBar', 'Restore Secondary Side Bar'),
 			tooltip: localize('restoreAuxiliaryBar', 'Restore Secondary Side Bar'),
 			category: Categories.View,
-			f1: true,
+			f1: !SecondarySideBarRemoved,
 			precondition: AuxiliaryBarMaximizedContext,
 			keybinding: {
 				weight: KeybindingWeight.WorkbenchContrib,
@@ -265,7 +265,7 @@ class ToggleMaximizedAuxiliaryBar extends Action2 {
 			id: ToggleMaximizedAuxiliaryBar.ID,
 			title: localize2('toggleMaximizedAuxiliaryBar', 'Toggle Maximized Secondary Side Bar'),
 			tooltip: localize('maximizeAuxiliaryBarTooltip2', "Maximize Secondary Side Bar"),
-			f1: true,
+			f1: !SecondarySideBarRemoved,
 			category: Categories.View,
 			icon: maximizeIcon,
 			toggled: {

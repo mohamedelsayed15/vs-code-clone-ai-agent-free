@@ -6,7 +6,7 @@
 import { localize } from '../../../nls.js';
 import { ActionsOrientation } from '../../../base/browser/ui/actionbar/actionbar.js';
 import { IActivityService } from '../../services/activity/common/activity.js';
-import { IWorkbenchLayoutService, Parts } from '../../services/layout/browser/layoutService.js';
+import { IWorkbenchLayoutService, Parts, SecondarySideBarRemoved } from '../../services/layout/browser/layoutService.js';
 import { IInstantiationService } from '../../../platform/instantiation/common/instantiation.js';
 import { IDisposable, DisposableStore, Disposable, DisposableMap, combinedDisposable } from '../../../base/common/lifecycle.js';
 import { IColorTheme } from '../../../platform/theme/common/themeService.js';
@@ -163,7 +163,7 @@ export class PaneCompositeBar extends Disposable {
 
 		// Move View Container
 		const moveActions = [];
-		for (const location of [ViewContainerLocation.Sidebar, ViewContainerLocation.AuxiliaryBar, ViewContainerLocation.Panel]) {
+		for (const location of SecondarySideBarRemoved ? [ViewContainerLocation.Sidebar, ViewContainerLocation.Panel] : [ViewContainerLocation.Sidebar, ViewContainerLocation.AuxiliaryBar, ViewContainerLocation.Panel]) {
 			if (currentLocation !== location) {
 				moveActions.push(this.createMoveAction(viewContainer, location, defaultLocation));
 			}

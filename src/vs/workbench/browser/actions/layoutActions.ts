@@ -8,7 +8,7 @@ import { MenuId, MenuRegistry, registerAction2, Action2 } from '../../../platfor
 import { Categories } from '../../../platform/action/common/actionCommonCategories.js';
 import { IConfigurationService } from '../../../platform/configuration/common/configuration.js';
 import { alert } from '../../../base/browser/ui/aria/aria.js';
-import { EditorActionsLocation, EditorTabsMode, IWorkbenchLayoutService, LayoutSettings, ModernUIDensity, Parts, Position, ZenModeSettings, positionToString } from '../../services/layout/browser/layoutService.js';
+import { EditorActionsLocation, EditorTabsMode, IWorkbenchLayoutService, LayoutSettings, ModernUIDensity, Parts, Position, SecondarySideBarRemoved, ZenModeSettings, positionToString } from '../../services/layout/browser/layoutService.js';
 import { ServicesAccessor, IInstantiationService } from '../../../platform/instantiation/common/instantiation.js';
 import { KeyMod, KeyCode } from '../../../base/common/keyCodes.js';
 import { isWindows, isLinux, isWeb, isMacintosh, isNative } from '../../../base/common/platform.js';
@@ -995,7 +995,7 @@ class MoveFocusedViewAction extends Action2 {
 			});
 		}
 
-		if (!(isViewSolo && currentLocation === ViewContainerLocation.AuxiliaryBar)) {
+		if (!SecondarySideBarRemoved && !(isViewSolo && currentLocation === ViewContainerLocation.AuxiliaryBar)) {
 			items.push({
 				id: '_.auxiliarybar.newcontainer',
 				label: localize('moveFocusedView.newContainerInSidePanel', "New Secondary Side Bar Entry")
@@ -1044,12 +1044,14 @@ class MoveFocusedViewAction extends Action2 {
 				};
 			}));
 
-		items.push({
-			type: 'separator',
-			label: localize('secondarySideBar', "Secondary Side Bar")
-		});
+		if (!SecondarySideBarRemoved) {
+			items.push({
+				type: 'separator',
+				label: localize('secondarySideBar', "Secondary Side Bar")
+			});
+		}
 
-		const pinnedAuxPanels = paneCompositePartService.getPinnedPaneCompositeIds(ViewContainerLocation.AuxiliaryBar);
+		const pinnedAuxPanels = SecondarySideBarRemoved ? [] : paneCompositePartService.getPinnedPaneCompositeIds(ViewContainerLocation.AuxiliaryBar);
 		items.push(...pinnedAuxPanels
 			.filter(panel => {
 				if (panel === viewDescriptorService.getViewContainerByViewId(focusedViewId)!.id) {
@@ -1366,7 +1368,7 @@ if (!isMacintosh || !isNative) {
 ToggleVisibilityActions.push(...[
 	CreateToggleLayoutItem(ToggleActivityBarVisibilityActionId, ContextKeyExpr.notEquals('config.workbench.activityBar.location', 'hidden'), localize('activityBar', "Activity Bar"), { whenA: ContextKeyExpr.equals('config.workbench.sideBar.location', 'left'), iconA: activityBarLeftIcon, iconB: activityBarRightIcon }),
 	CreateToggleLayoutItem(ToggleSidebarVisibilityAction.ID, SideBarVisibleContext, localize('sideBar', "Primary Side Bar"), { whenA: ContextKeyExpr.equals('config.workbench.sideBar.location', 'left'), iconA: panelLeftIcon, iconB: panelRightIcon }),
-	CreateToggleLayoutItem(ToggleAuxiliaryBarAction.ID, AuxiliaryBarVisibleContext, localize('secondarySideBar', "Secondary Side Bar"), { whenA: ContextKeyExpr.equals('config.workbench.sideBar.location', 'left'), iconA: panelRightIcon, iconB: panelLeftIcon }),
+	...(SecondarySideBarRemoved ? [] : [CreateToggleLayoutItem(ToggleAuxiliaryBarAction.ID, AuxiliaryBarVisibleContext, localize('secondarySideBar', "Secondary Side Bar"), { whenA: ContextKeyExpr.equals('config.workbench.sideBar.location', 'left'), iconA: panelRightIcon, iconB: panelLeftIcon })]),
 	CreateToggleLayoutItem(TogglePanelAction.ID, PanelVisibleContext, localize('panel', "Panel"), panelIcon),
 	CreateToggleLayoutItem(ToggleStatusbarVisibilityAction.ID, ContextKeyExpr.equals('config.workbench.statusBar.visible', true), localize('statusBar', "Status Bar"), statusBarIcon),
 ]);
