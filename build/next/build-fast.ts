@@ -70,7 +70,7 @@ export async function runBuildFast(repoRoot: string, force: boolean): Promise<vo
 	const lock = await acquireLock(path.join(stateDir, 'lock'));
 
 	try {
-		const environment = readEnvironment(repoRoot);
+		const environment = readEnvironment();
 		const statePath = path.join(stateDir, 'state.json');
 		const saved = await readState(statePath);
 
@@ -416,7 +416,7 @@ function logPlan(plan: BuildFastPlan): void {
 	console.log(`[build-fast] client=${plan.client}, extensions=${plan.extensions}, copilot=${plan.copilot}`);
 }
 
-function readEnvironment(repoRoot: string): string {
+function readEnvironment(): string {
 	return [
 		`recipe=${BUILD_RECIPE}`,
 		`platform=${process.platform}`,
